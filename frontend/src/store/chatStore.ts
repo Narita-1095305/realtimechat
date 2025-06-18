@@ -129,6 +129,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
           case 'chat_message':
             if (parsedData.data) {
               console.log('✅ Processing chat message:', parsedData.data);
+              
+              // WebSocketから受信したメッセージを追加
+              // （API経由での保存をやめたので、自分のメッセージもWebSocketから受信する）
               get().addMessage(parsedData.data);
             } else {
               console.warn('⚠️ Chat message without data:', parsedData);
@@ -217,20 +220,20 @@ export const useChatStore = create<ChatState>((set, get) => ({
       throw new Error(error);
     }
 
-    // Send via WebSocket - バックエンドが期待する構造に合わせる
-    const messageData = {
-      type: 'chat_message',
-      channel,
-      content,
-    };
-
-    console.log('📤 Sending WebSocket message:', messageData);
-    
     try {
+      // WebSocket経由でメッセージを送信（バックエンドで保存・配信処理）
+      const messageData = {
+        type: 'chat_message',
+        channel,
+        content,
+      };
+
+      console.log('📤 Sending WebSocket message:', messageData);
       ws.send(JSON.stringify(messageData));
       console.log('✅ WebSocket message sent successfully');
+      
     } catch (error) {
-      console.error('❌ WebSocket send failed:', error);
+      console.error('❌ Failed to send message:', error);
       throw error;
     }
   },

@@ -60,7 +60,7 @@ func main() {
 	messageService := service.NewMessageService(messageRepo, userRepo)
 
 	// WebSocketハブの初期化
-	hub := ws.NewHub(database.RedisClient, database.RedisSubscriber)
+	hub := ws.NewHub(database.RedisClient, database.RedisSubscriber, messageService)
 	go hub.Run() // バックグラウンドでハブを実行
 
 	// ミドルウェアの初期化

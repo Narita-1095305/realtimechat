@@ -6,6 +6,8 @@ import (
 	"log"
 	"sync"
 
+	"chatapp/internal/service"
+
 	"github.com/go-redis/redis/v8"
 )
 
@@ -28,6 +30,9 @@ type Hub struct {
 
 	// Redis subscriber client (separate instance for subscribe operations)
 	redisSubscriber *redis.Client
+
+	// Message service for database operations
+	messageService *service.MessageService
 
 	// Mutex for thread-safe operations
 	mutex sync.RWMutex
@@ -61,7 +66,7 @@ type ChatMessage struct {
 }
 
 // NewHub creates a new WebSocket hub
-func NewHub(redisClient *redis.Client, redisSubscriber *redis.Client) *Hub {
+func NewHub(redisClient *redis.Client, redisSubscriber *redis.Client, messageService *service.MessageService) *Hub {
 	return &Hub{
 		clients:         make(map[*Client]bool),
 		broadcast:       make(chan []byte),
@@ -69,6 +74,7 @@ func NewHub(redisClient *redis.Client, redisSubscriber *redis.Client) *Hub {
 		unregister:      make(chan *Client),
 		redisClient:     redisClient,
 		redisSubscriber: redisSubscriber,
+		messageService:  messageService,
 		ctx:             context.Background(),
 	}
 }

@@ -39,7 +39,7 @@ export function MessageInput({
           placeholder={placeholder}
           disabled={disabled}
           rows={1}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-900 placeholder-gray-500"
           style={{
             minHeight: '40px',
             maxHeight: '120px',

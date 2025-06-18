@@ -5,6 +5,8 @@ import (
 	"log"
 	"time"
 
+	"chatapp/internal/service"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"nhooyr.io/websocket"
@@ -167,18 +169,33 @@ func (c *Client) handleChatMessage(msg IncomingMessage) {
 		return
 	}
 
-	// Create message for broadcasting
+	// Save message to database first
+	log.Printf("💾 Saving message to database via MessageService...")
+	messageReq := service.CreateMessageRequest{
+		Content: msg.Content,
+		Channel: msg.Channel,
+	}
+
+	savedMessage, err := c.hub.messageService.CreateMessage(c.UserID, messageReq)
+	if err != nil {
+		log.Printf("❌ Failed to save message to database: %v", err)
+		return
+	}
+
+	log.Printf("✅ Message saved to database with ID: %d", savedMessage.ID)
+
+	// Create message for broadcasting using the saved message data
 	chatMsg := Message{
 		Type:    "chat_message",
 		Channel: msg.Channel,
 		Data: ChatMessage{
-			ID:        uint(time.Now().UnixNano()), // より精密なIDを使用
-			Content:   msg.Content,
-			Channel:   msg.Channel,
-			CreatedAt: time.Now().UTC().Format(time.RFC3339),
+			ID:        savedMessage.ID,
+			Content:   savedMessage.Content,
+			Channel:   savedMessage.Channel,
+			CreatedAt: savedMessage.CreatedAt.Format(time.RFC3339),
 			User: UserInfo{
-				ID:       c.UserID,
-				Username: c.Username,
+				ID:       savedMessage.User.ID,
+				Username: savedMessage.User.Username,
 			},
 		},
 		UserID: c.UserID,

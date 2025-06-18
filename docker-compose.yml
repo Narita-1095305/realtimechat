@@ -34,7 +34,7 @@ services:
       - DB_NAME=chatapp
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - JWT_SECRET=your-secret-key-here
+      - JWT_SECRET=test-secret-key-for-local-development
     command: sh -c "sleep 10 && ./migrate -migrate -seed && ./main"
 
 volumes:
